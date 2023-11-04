@@ -18,7 +18,7 @@ def download_file_from_s3(bucket, key, local_path):
     except Exception as e:
         print(f"An error occurred while downloading {key} from S3: {str(e)}")
 
-@app.route('/', methods=['POST'])
+@app.route('/', methods=['POST', 'GET'])
 def faceRecognition():
     try:
         print("Starting the face recognition process...")
