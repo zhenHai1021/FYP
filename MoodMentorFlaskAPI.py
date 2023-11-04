@@ -1,113 +1,37 @@
 from flask import Flask, request, jsonify
-import cv2
-import numpy as np
-import pickle
+from flask_cors import CORS
+import subprocess
 import os
-import boto3
 
 app = Flask(__name__)
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+CORS(app)
 
-# Initialize S3 client
-s3 = boto3.client('s3')
+@app.route('/recognize', methods=['POST'])
+def recognize():
+    # Receive the image from the Flutter app
+    image = request.files['image']
 
-def download_file_from_s3(bucket, key, local_path):
+    # Save the received image
+    image_path = 'received_image.jpg'
+    image.save(image_path)
+
+    # Run the LoginMoodMentor.py script on the received image
     try:
-        s3.download_file(bucket, key, local_path)
-        print(f"Downloaded {key} from S3")
+        command = f'python LoginMoodMentor.py {image_path}'
+        result = subprocess.check_output(command, shell=True)
+        result = result.decode('utf-8').strip()
     except Exception as e:
-        print(f"An error occurred while downloading {key} from S3: {str(e)}")
+        result = str(e)
 
-@app.route('/', methods=['POST', 'GET'])
-def faceRecognition():
-    try:
-        print("Starting the face recognition process...")
-        # Initialize S3 client
-        s3 = boto3.client('s3')
+    # Delete the temporary image file
+    if os.path.exists(image_path):
+        os.remove(image_path)
 
-        # Specify the S3 bucket name
-        bucket_name = 'facial-login-model-bucket'  # Replace with your S3 bucket name
+    # Return the result to the Flutter app
+    response = {
+        'result': result
+    }
+    return jsonify(response)
 
-        faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-
-        # Load the Haar Cascade XML file
-        print("Loading the Haar Cascade XML file...")
-        faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-
-        # Download the 'names.pkl' file from S3
-        names_file_key = 'names.pkl'
-        download_file_from_s3(bucket_name, names_file_key, 'names.pkl')
-
-        # Load the 'names.pkl' file
-        with open('names.pkl', 'rb') as f:
-            names = pickle.load(f)
-
-        # Load the face recognition model
-        recognizer = cv2.face_LBPHFaceRecognizer_create()
-        model_file_key = 'trainer/trainer.yml'  # Correct the S3 key format
-        print(f"Downloading face recognition model from {model_file_key}")
-        download_file_from_s3(bucket_name, model_file_key, 'trainer.yml')
-        recognizer.read('trainer.yml')
-
-        font = cv2.FONT_HERSHEY_SIMPLEX
-
-        total_cameras = 2
-        current_camera = 0
-        cam = cv2.VideoCapture(0)
-        cam.set(3, 640)
-        cam.set(4, 480)
-        minW = 0.1 * cam.get(3)
-        minH = 0.1 * cam.get(4)
-
-        results = []
-
-        while True:
-            ret, img = cam.read()
-
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-            faces = faceCascade.detectMultiScale(
-                gray,
-                scaleFactor=1.2,
-                minNeighbors=5,
-                minSize=(int(minW), int(minH)),
-            )
-
-            for (x, y, w, h) in faces:
-                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-                id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
-
-                if confidence < 100:
-                    if id >= 0 and id < len(names):
-                        id = names[id]
-                        confidence = "  {0}%".format(round(100 - confidence))
-                    else:
-                        id = "unknown"
-                        confidence = "  {0}%".format(round(100 - confidence))
-
-                results.append({'id': str(id), 'confidence': str(confidence)})
-
-            cv2.imshow('camera', img)
-
-            k = cv2.waitKey(10) & 0xff
-            if k == 27:
-                break
-            elif k == ord('c') or k == ord('C'):
-                current_camera = (current_camera + 1) % total_cameras
-                cam.release()
-                cam = cv2.VideoCapture(current_camera)
-                cam.set(3, 640)
-                cam.set(4, 480)
-
-        print("\nExiting Recognizer.")
-        cam.release()
-        cv2.destroyAllWindows()
-
-        return jsonify(results)
-
-    except Exception as e:
-        return jsonify({'error': str(e)})
-
-if __name__ == '__main':
-    app.run(host='0.0.0.0', port=80, debug=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
