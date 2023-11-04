@@ -5,7 +5,7 @@ import pickle
 import os
 import boto3
 
-app = Flask(__name)
+app = Flask(__name__)
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 @app.route('/')
