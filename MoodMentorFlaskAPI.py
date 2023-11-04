@@ -104,8 +104,10 @@ def faceRecognition():
         cam.release()
         cv2.destroyAllWindows()
 
+
+
     except Exception as e:
         return jsonify({'error': str(e)})
-
+faceRecognition()
 if __name__ == '__main':
     app.run(host='0.0.0.0', port=80, debug=True)
