@@ -8,7 +8,7 @@ import boto3
 app = Flask(__name__)
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
-@app.route('/')
+@app.route('/', methods=['POST', 'GET'])
 def faceRecognition():
     try:
         print("Starting the face recognition process...")
