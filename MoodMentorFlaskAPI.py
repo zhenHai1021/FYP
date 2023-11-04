@@ -75,5 +75,5 @@ def faceRecognition():
 
     return jsonify(results)
 
-if __name == '__main':
+if __name__ == '__main':
     app.run(host='0.0.0.0', port=80, debug=True)
