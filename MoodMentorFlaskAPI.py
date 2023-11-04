@@ -1,44 +1,80 @@
-import boto3
+from flask import Flask, request, jsonify
 import cv2
 import numpy as np
 import pickle
 import os
-from flask import Flask, jsonify
+import boto3
 
 app = Flask(__name__)
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
-def download_file_from_s3(bucket, key, local_path):
-    try:
-        s3.download_file(bucket, key, local_path)
-        print(f"Downloaded {key} from S3")
-    except Exception as e:
-        print(f"An error occurred while downloading {key} from S3: {str(e)}")
+# Initialize S3 client outside the route
+s3 = boto3.client('s3')
+
+# Specify the S3 bucket name
+bucket_name = 'facial-login-model-bucket'  # Replace with your S3 bucket name
+
+# Download the Haar Cascade XML file from S3
+haarcascade_file_key = 'haarcascade_frontalface_default.xml'
+s3.download_file(bucket_name, haarcascade_file_key, 'haarcascade_frontalface_default.xml')
+
+# Load the Haar Cascade XML file
+faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+
+# Download the 'names.pkl' file from S3
+names_file_key = 'names.pkl'
+s3.download_file(bucket_name, names_file_key, 'names.pkl')
+
+# Load the 'names.pkl' file
+with open('names.pkl', 'rb') as f:
+    names = pickle.load(f)
+
+# Initialize the recognizer
+recognizer = cv2.face_LBPHFaceRecognizer.create()
+model_file_key = 'trainer/trainer.yml'
+s3.download_file(bucket_name, model_file_key, 'trainer.yml')
+recognizer.read('trainer.yml')
+
+font = cv2.FONT_HERSHEY_SIMPLEX
 
 @app.route('/', methods=['GET', 'POST'])
 def faceRecognition():
-    # Initialize S3 client
-    s3 = boto3.client('s3')
+    # Check if the request contains an image file
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image provided'}), 400
 
-    # Specify the S3 bucket name
-    bucket_name = 'facial-login-model-bucket'  # Replace with your S3 bucket name
+    image = request.files['image'].read()
+    image_array = np.fromstring(image, np.uint8)
+    img = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
-    # Download the Haar Cascade XML file from S3
-    haarcascade_file_key = 'haarcascade_frontalface_default.xml'
-    download_file_from_s3(bucket_name, haarcascade_file_key, 'haarcascade_frontalface_default.xml')
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # Load the Haar Cascade XML file
-    faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+    faces = faceCascade.detectMultiScale(
+        gray,
+        scaleFactor=1.2,
+        minNeighbors=5,
+        minSize=(30, 30),
+    )
 
-    # Download the 'names.pkl' file from S3
-    names_file_key = 'names.pkl'
-    download_file_from_s3(bucket_name, names_file_key, 'names.pkl')
+    results = []
 
-    # Load the 'names.pkl' file
-    with open('names.pkl', 'rb') as f:
-        names = pickle.load(f)
+    for (x, y, w, h) in faces:
+        id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
 
-    # Rest of your code...
+        if confidence < 100:
+            if id >= 0 and id < len(names):
+                id = names[id]
+                confidence = round(100 - confidence)
+            else:
+                id = "unknown"
+                confidence = round(100 - confidence)
+        else:
+            id = "unknown"
+            confidence = 0
+
+        results.append({'user': id, 'confidence': confidence})
+
+    return jsonify(results)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
