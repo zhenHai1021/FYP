@@ -8,7 +8,7 @@ import boto3
 app = Flask(__name__)
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
-@app.route('/', methods=['POST'])
+@app.route('/', methods=['POST'], methods=['GET'])
 def faceRecognition():
     # Check if the request contains an image file
     if 'image' not in request.files:
