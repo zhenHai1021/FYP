@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/recognize', methods=['POST'])
+@app.route('/', methods=['POST'])
 def recognize():
     # Receive the image from the Flutter app
     image = request.files['image']
