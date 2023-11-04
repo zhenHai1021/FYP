@@ -38,7 +38,7 @@ def faceRecognition():
         names_file_key = 'names.pkl'
         download_file_from_s3(bucket_name, names_file_key, 'names.pkl')
 
-         # Load the 'names.pkl' file
+        # Load the 'names.pkl' file
         with open('names.pkl', 'rb') as f:
             names = pickle.load(f)
 
@@ -104,12 +104,10 @@ def faceRecognition():
         cam.release()
         cv2.destroyAllWindows()
 
-faceRecognition()
-
         return jsonify(results)
 
     except Exception as e:
-        return jsonify({'error': str(e)})
+        return jsonify({'error': str(e})
 
 if __name__ == '__main':
     app.run(host='0.0.0.0', port=80, debug=True)
