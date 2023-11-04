@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 import cv2
 import numpy as np
 import pickle
@@ -8,6 +8,9 @@ import boto3
 app = Flask(__name__)
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
+# Initialize S3 client
+s3 = boto3.client('s3')
+
 def download_file_from_s3(bucket, key, local_path):
     try:
         s3.download_file(bucket, key, local_path)
@@ -15,8 +18,7 @@ def download_file_from_s3(bucket, key, local_path):
     except Exception as e:
         print(f"An error occurred while downloading {key} from S3: {str(e)}")
 
-
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/', methods=['POST'])
 def faceRecognition():
     try:
         print("Starting the face recognition process...")
@@ -41,10 +43,10 @@ def faceRecognition():
             names = pickle.load(f)
 
         # Load the face recognition model
-        recognizer = cv2.face_LBPHFaceRecognizer.create()
-        model_file_key = 's3://facial-login-model-bucket/trainer/trainer.yml'
+        recognizer = cv2.face_LBPHFaceRecognizer_create()
+        model_file_key = 'trainer/trainer.yml'  # Correct the S3 key format
         print(f"Downloading face recognition model from {model_file_key}")
-        s3.download_file(bucket_name, model_file_key, 'trainer.yml')
+        download_file_from_s3(bucket_name, model_file_key, 'trainer.yml')
         recognizer.read('trainer.yml')
 
         font = cv2.FONT_HERSHEY_SIMPLEX
@@ -56,6 +58,8 @@ def faceRecognition():
         cam.set(4, 480)
         minW = 0.1 * cam.get(3)
         minH = 0.1 * cam.get(4)
+
+        results = []
 
         while True:
             ret, img = cam.read()
@@ -82,8 +86,7 @@ def faceRecognition():
                         id = "unknown"
                         confidence = "  {0}%".format(round(100 - confidence))
 
-                cv2.putText(img, str(id), (x + 5, y - 5), font, 1, (255, 255, 255), 2)
-                cv2.putText(img, str(confidence), (x + 5, y + h - 5), font, 1, (255, 255, 0), 1)
+                results.append({'id': str(id), 'confidence': str(confidence)})
 
             cv2.imshow('camera', img)
 
@@ -101,8 +104,10 @@ def faceRecognition():
         cam.release()
         cv2.destroyAllWindows()
 
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
+        return jsonify(results)
 
-if __name__ == '__main__':
+    except Exception as e:
+        return jsonify({'error': str(e})
+
+if __name__ == '__main':
     app.run(host='0.0.0.0', port=80, debug=True)
