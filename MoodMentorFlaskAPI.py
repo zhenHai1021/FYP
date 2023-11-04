@@ -107,7 +107,7 @@ def faceRecognition():
         return jsonify(results)
 
     except Exception as e:
-        return jsonify({'error': str(e)})
+        return jsonify({'error': str(e})
 
 if __name__ == '__main':
     app.run(host='0.0.0.0', port=80, debug=True)
