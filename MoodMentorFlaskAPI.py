@@ -4,6 +4,9 @@ import numpy as np
 import pickle
 import requests
 
+from PIL import Image
+
+
 app = Flask(__name__)
 
 # Function to download files from URLs and save them locally
