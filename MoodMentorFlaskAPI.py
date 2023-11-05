@@ -1,25 +1,33 @@
 from flask import Flask, request, jsonify
 import subprocess
-import boto3
+import requests
 
 app = Flask(__name__)
 
-# Define your AWS S3 bucket and object key for the Login.py script
-S3_BUCKET_NAME = 'facial-login-model-bucket'
-S3_OBJECT_KEY = 'LoginMoodMentor.py'
-
-s3 = boto3.client('s3')
+def get_s3_script_url():
+    # Define the S3 bucket URL and object key for the LoginMoodMentor.py script
+    S3_BUCKET_URL = 'https://facial-login-model-bucket.s3.amazonaws.com/'
+    S3_OBJECT_KEY = 'LoginMoodMentor.py'
+    return f"{S3_BUCKET_URL}{S3_OBJECT_KEY}"
 
 @app.route('/facialLogin', methods=['GET'])
 def facial_login():
     try:
-        # Fetch the 'Login.py' script from S3
-        s3.download_file(S3_BUCKET_NAME, S3_OBJECT_KEY, '/tmp/LoginMoodMentor.py')
+        s3_script_url = get_s3_script_url()
 
-        # Execute the script
-        result = subprocess.check_output(['python', '/tmp/LoginMoodMentor.py'], stderr=subprocess.STDOUT, text=True)
+        # Fetch the 'LoginMoodMentor.py' script from the S3 bucket URL
+        s3_script = requests.get(s3_script_url)
 
-        return jsonify({'result': result})
+        if s3_script.status_code == 200:
+            with open('/tmp/LoginMoodMentor.py', 'wb') as f:
+                f.write(s3_script.content)
+
+            # Execute the script
+            result = subprocess.check_output(['python', '/tmp/LoginMoodMentor.py'], stderr=subprocess.STDOUT, text=True)
+
+            return jsonify({'result': result})
+        else:
+            return jsonify({'error': f"Failed to fetch 'LoginMoodMentor.py' from S3: {s3_script.status_code}"})
     except Exception as e:
         return jsonify({'error': str(e)})
 
