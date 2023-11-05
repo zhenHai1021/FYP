@@ -2,7 +2,7 @@ from flask import Flask, request
 import subprocess
 import requests
 
-app = Flask(__name)
+app = Flask(__name__)
 
 S3_PUBLIC_URL = 'https://facial-login-model-bucket.s3.amazonaws.com/hello_world.py'  # Replace with your S3 bucket URL
 
