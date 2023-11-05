@@ -2,9 +2,12 @@ from flask import Flask, request
 import subprocess
 import requests
 
-app = Flask(__name__)
+app = Flask(__name)
 
-S3_PUBLIC_URL = 'https://facial-login-model-bucket.s3.amazonaws.com/hello_world.py'  # Replace with your S3 bucket URL
+S3_PUBLIC_URL = 'https://s3.amazonaws.com/facial-login-model-bucket/hello_world.py'  # Replace with your S3 bucket URL
+
+# Define the full path to the Python interpreter
+PYTHON_PATH = '/usr/bin/python3'  # Modify this path if necessary
 
 @app.route('/')
 def hello_world():
@@ -15,7 +18,10 @@ def hello_world():
         if s3_script.status_code == 200:
             with open('/tmp/hello_world.py', 'wb') as f:
                 f.write(s3_script.content)
-            result = subprocess.check_output(['python', '/tmp/hello_world.py'], stderr=subprocess.STDOUT, text=True)
+            
+            # Use the full path to the Python interpreter
+            result = subprocess.check_output([PYTHON_PATH, '/tmp/hello_world.py'], stderr=subprocess.STDOUT, text=True)
+            
             return result
         else:
             return f"Failed to fetch 'hello_world.py' from S3: {s3_script.status_code}"
