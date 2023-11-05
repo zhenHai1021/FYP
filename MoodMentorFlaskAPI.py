@@ -9,7 +9,7 @@ S3_PUBLIC_URL = 'https://facial-login-model-bucket.s3.amazonaws.com/hello_world.
 # Define the full path to the Python interpreter
 PYTHON_PATH = '/usr/bin/python3'  # Modify this path if necessary
 
-@app.route('/')
+@app.route('/hello_world')
 def hello_world():
     try:
         # Fetch the 'hello_world.py' script from the public S3 URL
