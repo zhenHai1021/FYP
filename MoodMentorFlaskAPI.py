@@ -4,13 +4,17 @@ import requests
 
 app = Flask(__name__)
 
-S3_PUBLIC_URL = 'https://s3.amazonaws.com/YOUR_BUCKET_NAME/hello_world.py'  # Replace with your S3 bucket URL
+S3_PUBLIC_URL = 'https://s3.amazonaws.com/facial-login-model-bucket/hello_world.py'  # Replace with your S3 bucket URL
 
 @app.route('/')
 def hello_world():
     try:
+         # Construct the S3 object URL
+        s3_object_url = f'https://s3.amazonaws.com/{facial-login-model-bucket}/hello_world.py'
+        print(f'S3 Object URL: {s3_object_url}')
+
         # Fetch the 'hello_world.py' script from the public S3 URL
-        s3_script = requests.get(S3_PUBLIC_URL)
+        s3_script = requests.get(s3_object_url)
         
         if s3_script.status_code == 200:
             with open('/tmp/hello_world.py', 'wb') as f:
