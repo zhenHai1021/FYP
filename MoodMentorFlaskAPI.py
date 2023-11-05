@@ -4,7 +4,7 @@ import requests
 
 app = Flask(__name__)
 
-S3_PUBLIC_URL = 'https://s3.amazonaws.com/facial-login-model-bucket/hello_world.py'  # Replace with your S3 bucket URL
+S3_PUBLIC_URL = 'https://facial-login-model-bucket.s3.amazonaws.com/hello_world.py'  # Replace with your S3 bucket URL
 
 @app.route('/')
 def hello_world():
