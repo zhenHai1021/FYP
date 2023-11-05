@@ -2,18 +2,15 @@ from flask import Flask, request, jsonify
 import subprocess
 import requests
 
-app = Flask(__name__)
+app = Flask(__name)
 
+S3_PUBLIC_URL = 'https://s3.amazonaws.com/facial-login-model-bucket/hello_world.py'  # Replace with your S3 bucket URL
 
 @app.route('/')
 def hello_world():
     try:
-         # Construct the S3 object URL
-        s3_object_url = f'https://s3.amazonaws.com/{facial-login-model-bucket}/hello_world.py'
-        print(f'S3 Object URL: {s3_object_url}')
-
         # Fetch the 'hello_world.py' script from the public S3 URL
-        s3_script = requests.get(s3_object_url)
+        s3_script = requests.get(S3_PUBLIC_URL)
         
         if s3_script.status_code == 200:
             with open('/tmp/hello_world.py', 'wb') as f:
@@ -31,4 +28,4 @@ def hello_world():
         return jsonify({'error': str(e)})
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=5000)
