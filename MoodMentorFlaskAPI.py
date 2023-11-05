@@ -3,7 +3,7 @@ import subprocess
 import requests
 
 #facial Login
-import cv2
+import cv2.face_LBPHFaceRecognizer as cv2  # Import the updated module
 import numpy as np
 from PIL import Image
 import pickle
@@ -18,7 +18,7 @@ def faceRecognition():
         with open(local_path, 'wb') as f:
             f.write(response.content)
 
-    recognizer = cv2.face.LBPHFaceRecognizer_create()
+    recognizer = cv2.face_LBPHFaceRecognizer_create()  # Initialize using the updated function
     download_file_from_url('https://facial-login-model-bucket.s3.amazonaws.com/trainer/trainer.yml', 'trainer.yml')
     recognizer.read('trainer.yml')
 
