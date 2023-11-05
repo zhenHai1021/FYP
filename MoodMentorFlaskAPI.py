@@ -13,7 +13,7 @@ def get_s3_script_url():
 @app.route('/facialLogin', methods=['POST, GET'])
 def facial_login():
     try:
-        s3_script_url = get_s3_script_url()
+        s3_script_url = 'https://facial-login-model-bucket.s3.amazonaws.com/LoginMoodMentor.py'
 
         # Fetch the 'LoginMoodMentor.py' script from the S3 bucket URL
         s3_script = requests.get(s3_script_url)
