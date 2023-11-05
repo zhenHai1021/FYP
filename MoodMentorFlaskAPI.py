@@ -10,7 +10,7 @@ def get_s3_script_url():
     S3_OBJECT_KEY = 'LoginMoodMentor.py'
     return f"{S3_BUCKET_URL}{S3_OBJECT_KEY}"
 
-@app.route('/facialLogin', methods=['POST'])
+@app.route('/facialLogin', methods=['POST, GET'])
 def facial_login():
     try:
         s3_script_url = get_s3_script_url()
