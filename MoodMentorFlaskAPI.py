@@ -2,16 +2,38 @@ from flask import Flask, request, jsonify
 import cv2
 import numpy as np
 import pickle
+import requests
 
 app = Flask(__name__)
 
+# Function to download files from URLs and save them locally
+def download_file_from_url(url, local_path):
+    response = requests.get(url)
+    with open(local_path, 'wb') as f:
+        f.write(response.content)
+
+# URLs for model files
+trainer_url = 'https://facial-login-model-bucket.s3.amazonaws.com/trainer/trainer.yml'
+cascade_url = 'https://facial-login-model-bucket.s3.amazonaws.com/haarcascade_frontalface_default.xml'
+names_url = 'https://facial-login-model-bucket.s3.amazonaws.com/names.pkl'
+
+# Paths to save the downloaded files
+trainer_path = 'trainer.yml'
+cascade_path = 'haarcascade_frontalface_default.xml'
+names_path = 'names.pkl'
+
+# Download the model files
+download_file_from_url(trainer_url, trainer_path)
+download_file_from_url(cascade_url, cascade_path)
+download_file_from_url(names_url, names_path)
+
 # Load the trained recognizer and cascade classifier
 recognizer = cv2.face_LBPHFaceRecognizer.create()
-recognizer.read('trainer.yml')
-faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+recognizer.read(trainer_path)
+faceCascade = cv2.CascadeClassifier(cascade_path)
 
 # Load the names of recognized individuals
-with open('names.pkl', 'rb') as f:
+with open(names_path, 'rb') as f:
     names = pickle.load(f)
 
 @app.route('/facialLogin', methods=['POST'])
