@@ -1,13 +1,10 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import subprocess
 import requests
 
-app = Flask(__name__)
+app = Flask(__name)
 
-S3_PUBLIC_URL = 'https://s3.amazonaws.com/facial-login-model-bucket/hello_world.py'  # Replace with your S3 bucket URL
-
-# Define the full path to the Python interpreter
-PYTHON_PATH = '/usr/bin/python3'  # Modify this path if necessary
+S3_PUBLIC_URL = 'https://s3.amazonaws.com/YOUR_BUCKET_NAME/hello_world.py'  # Replace with your S3 bucket URL
 
 @app.route('/')
 def hello_world():
@@ -19,14 +16,16 @@ def hello_world():
             with open('/tmp/hello_world.py', 'wb') as f:
                 f.write(s3_script.content)
             
-            # Use the full path to the Python interpreter
-            result = subprocess.check_output([PYTHON_PATH, '/tmp/hello_world.py'], stderr=subprocess.STDOUT, text=True)
+            # Execute the script
+            result = subprocess.check_output(['python', '/tmp/hello_world.py'], stderr=subprocess.STDOUT, text=True)
             
-            return result
+            # Return the result as JSON
+            response_data = {'result': result}
+            return jsonify(response_data)
         else:
-            return f"Failed to fetch 'hello_world.py' from S3: {s3_script.status_code}"
+            return jsonify({'error': f"Failed to fetch 'hello_world.py' from S3: {s3_script.status_code}"})
     except Exception as e:
-        return str(e)
+        return jsonify({'error': str(e)})
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=5000)
