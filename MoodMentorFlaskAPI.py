@@ -4,13 +4,8 @@ import requests
 
 app = Flask(__name__)
 
-def get_s3_script_url():
-    # Define the S3 bucket URL and object key for the LoginMoodMentor.py script
-    S3_BUCKET_URL = 'https://facial-login-model-bucket.s3.amazonaws.com/'
-    S3_OBJECT_KEY = 'LoginMoodMentor.py'
-    return f"{S3_BUCKET_URL}{S3_OBJECT_KEY}"
 
-@app.route('/facialLogin', methods=['POST, GET'])
+@app.route('/facialLogin', methods=['POST', 'GET'])  # Separate GET and POST using square brackets
 def facial_login():
     try:
         s3_script_url = 'https://facial-login-model-bucket.s3.amazonaws.com/LoginMoodMentor.py'
