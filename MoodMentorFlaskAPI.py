@@ -3,7 +3,7 @@ import subprocess
 import requests
 
 #facial Login
-import cv2.face_LBPHFaceRecognizer as cv2  # Import the updated module
+import cv2  # Import the updated module
 import numpy as np
 from PIL import Image
 import pickle
