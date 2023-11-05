@@ -28,7 +28,7 @@ download_file_from_url(cascade_url, cascade_path)
 download_file_from_url(names_url, names_path)
 
 # Load the trained recognizer and cascade classifier
-recognizer = cv2.face.LBPHFaceRecognizer_create()
+recognizer = cv2.face_LBPHFaceRecognizer_create()
 recognizer.read(trainer_path)
 faceCascade = cv2.CascadeClassifier(cascade_path)
 
