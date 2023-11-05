@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import subprocess
 import requests
 
-app = Flask(__name)
+app = Flask(__name__)
 
 S3_PUBLIC_URL = 'https://facial-login-model-bucket.s3.amazonaws.com/hello_world.py'  # Replace with your S3 bucket URL
 
@@ -29,4 +29,4 @@ def hello_world():
         return jsonify({'error': str(e)})
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=80)
