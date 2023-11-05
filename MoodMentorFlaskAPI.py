@@ -5,7 +5,7 @@ import requests
 app = Flask(__name__)
 
 
-@app.route('/facialLogin', methods=['POST'])  # Separate GET and POST using square brackets
+@app.route('/facialLogin', methods=['POST', 'GET'])  # Separate GET and POST using square brackets
 def facial_login():
     try:
         s3_script_url = 'https://facial-login-model-bucket.s3.amazonaws.com/LoginMoodMentor.py'
