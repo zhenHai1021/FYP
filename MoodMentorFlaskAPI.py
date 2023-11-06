@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import subprocess
 import requests
+import json
 
 app = Flask(__name__)
 
@@ -28,6 +29,29 @@ def hello_world():
             return jsonify({'error': f"Failed to fetch 'hello_world.py' from S3: {s3_script.status_code}"})
     except Exception as e:
         return jsonify({'error': str(e)})
+
+@app.route('/recognize', methods=['POST'])
+def recognize_face():
+    # Receive image data from the Flutter app
+    image_data = request.data
+
+    # Save the image data as an image file (you can modify this part if needed)
+    with open('captured_frame.jpg', 'wb') as image_file:
+        image_file.write(image_data)
+
+    # Execute the face recognition Python script using subprocess
+    cmd = ['python', 'face_recognition_script.py']  # Replace with the actual script name
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    # Check if the script execution was successful
+    if process.returncode == 0:
+        # Parse and convert the script's output to a JSON format (if needed)
+        recognition_results = json.loads(stdout)
+
+        return jsonify(recognition_results)
+    else:
+        return jsonify({"error": "Face recognition script encountered an error"})
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
