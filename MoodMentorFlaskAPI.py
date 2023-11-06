@@ -44,12 +44,11 @@ def download_script_from_s3():
         S3_BUCKET_NAME = parsed_url.netloc
         S3_SCRIPT_KEY = parsed_url.path.lstrip('/')
 
-        # Download the script and save it as 'LoginMoodMentor.py'
         s3.download_file(S3_BUCKET_NAME, S3_SCRIPT_KEY, 'LoginMoodMentor.py')
         return None
-    except NoCredentialsError:
+    except botocore.exceptions.NoCredentialsError:
         return "S3 credentials not found"
-    except ClientError as e:
+    except botocore.exceptions.ClientError as e:
         return f"Error downloading script from S3 in API: {str(e)}"
 
 
