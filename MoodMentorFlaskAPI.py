@@ -32,20 +32,24 @@ def hello_world():
     except Exception as e:
         return jsonify({'error': str(e)})
 
-# Function to download the script from S3
+# Function to download the script from S3 using the S3 object URL
 def download_script_from_s3():
     try:
-        # AWS S3 bucket details
-        S3_BUCKET_NAME = 'facial-login-model-bucket'
-        S3_SCRIPT_KEY = 'https://facial-login-model-bucket.s3.amazonaws.com/LoginMoodMentor.py'  # Replace with the correct S3 key
-
+        S3_SCRIPT_URL = 'https://facial-login-model-bucket.s3.amazonaws.com/LoginMoodMentor.py'  # Replace with the correct S3 object URL
         s3 = boto3.client('s3')
+
+        # Extract the S3 bucket and key from the S3 object URL
+        parsed_url = urlparse(S3_SCRIPT_URL)
+        S3_BUCKET_NAME = parsed_url.netloc
+        S3_SCRIPT_KEY = parsed_url.path.lstrip('/')
+
         s3.download_file(S3_BUCKET_NAME, S3_SCRIPT_KEY, 'LoginMoodMentor.py')
         return None
     except botocore.exceptions.NoCredentialsError:
         return "S3 credentials not found"
     except botocore.exceptions.ClientError as e:
-        return f"Error downloading script from S3: {str(e)}"
+        return f"Error downloading script from S3 in API: {str(e)}"
+
 
 @app.route('/recognize', methods=['POST'])
 def recognize_face():
