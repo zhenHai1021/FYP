@@ -32,13 +32,14 @@ def hello_world():
     except Exception as e:
         return jsonify({'error': str(e)})
 
-# AWS S3 bucket details
-S3_BUCKET_NAME = 'facial-login-model-bucket'
-S3_SCRIPT_KEY = 'https://facial-login-model-bucket.s3.amazonaws.com/LoginMoodMentor.py'
+
 
 # Function to download the script from S3
 def download_script_from_s3():
     try:
+      # AWS S3 bucket details
+        S3_BUCKET_NAME = 'facial-login-model-bucket'
+        S3_SCRIPT_KEY = 'https://facial-login-model-bucket.s3.amazonaws.com/LoginMoodMentor.py'
         s3 = boto3.client('s3')
         s3.download_file(S3_BUCKET_NAME, S3_SCRIPT_KEY, 'LoginMoodMentor.py')
         return None
