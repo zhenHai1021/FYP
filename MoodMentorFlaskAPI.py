@@ -36,14 +36,16 @@ def hello_world():
 # Function to download the script from S3 using the S3 object URL
 def download_script_from_s3():
     try:
-         s3 = boto3.client('s3')
+       
+         s3 = boto3.resource('s3')
 
         # Extract the S3 bucket and key from the S3 object URL
     
         S3_BUCKET_NAME = 'facial-login-model-bucket'
         S3_SCRIPT_KEY = 'LoginMoodMentor.py'
 
-        s3.download_file(S3_BUCKET_NAME, S3_SCRIPT_KEY, 'LoginMoodMentorTmp.py')
+        s3.Bucket(S3_BUCKET_NAME).download_file(S3_SCRIPT_KEY, 'LoginMoodMentorTmp.py')
+
         return None
     except botocore.exceptions.NoCredentialsError:
         return "S3 credentials not found"
