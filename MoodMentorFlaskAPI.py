@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 import subprocess
 import requests
 import json
+import boto3
+import botocore
 
 app = Flask(__name__)
 
@@ -30,6 +32,21 @@ def hello_world():
     except Exception as e:
         return jsonify({'error': str(e)})
 
+# AWS S3 bucket details
+S3_BUCKET_NAME = 'facial-login-model-bucket'
+S3_SCRIPT_KEY = 'https://facial-login-model-bucket.s3.amazonaws.com/LoginMoodMentor.py'
+
+# Function to download the script from S3
+def download_script_from_s3():
+    try:
+        s3 = boto3.client('s3')
+        s3.download_file(S3_BUCKET_NAME, S3_SCRIPT_KEY, 'LoginMoodMentor.py')
+        return None
+    except botocore.exceptions.NoCredentialsError:
+        return "S3 credentials not found"
+    except botocore.exceptions.ClientError as e:
+        return f"Error downloading script from S3: {str(e)}"
+
 @app.route('/recognize', methods=['POST'])
 def recognize_face():
     # Receive image data from the Flutter app
@@ -39,8 +56,14 @@ def recognize_face():
     with open('captured_frame.jpg', 'wb') as image_file:
         image_file.write(image_data)
 
-    # Execute the face recognition Python script using subprocess
-    cmd = ['python', 'face_recognition_script.py']  # Replace with the actual script name
+    # Download the script from S3
+    s3_download_error = download_script_from_s3()
+
+    if s3_download_error:
+        return jsonify({"error": s3_download_error})
+
+    # Execute the downloaded face recognition Python script using subprocess
+    cmd = ['python', 'LoginMoodMentor.py']  # Replace with the actual script name
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
 
