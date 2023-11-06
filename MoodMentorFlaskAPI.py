@@ -67,15 +67,15 @@ def recognize_face():
         image_file.write(image_data)
 
     # Download the script from S3
-    s3_download_error = download_script_from_s3()
+    #s3_download_error = download_script_from_s3()
 
-    if s3_download_error:
-        return jsonify({"error": s3_download_error})
+    #if s3_download_error:
+    #    return jsonify({"error": s3_download_error})
      
     # Specify the full path to your Python interpreter
-    python_path = '/usr/bin/python3'  # Replace with the actual path
+    python_path = sys.executable # Replace with the actual path
     # Execute the downloaded face recognition Python script using subprocess
-    cmd = ['python', 'LoginMoodMentor.py']  # Replace with the actual script name
+    cmd = ['python', 'LoginMoodMentorTmp.py']  # Replace with the actual script name
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
 
