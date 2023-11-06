@@ -32,11 +32,49 @@ def hello_world():
     except Exception as e:
         return jsonify({'error': str(e)})
 
+# Function to download the script from S3
+def download_script_from_s3():
+    try:
+        # AWS S3 bucket details
+        S3_BUCKET_NAME = 'facial-login-model-bucket'
+        S3_SCRIPT_KEY = 's3://facial-login-model-bucket/LoginMoodMentor.py'  # Replace with the correct S3 key
+
+        s3 = boto3.client('s3')
+        s3.download_file(S3_BUCKET_NAME, S3_SCRIPT_KEY, 'LoginMoodMentor.py')
+        return None
+    except botocore.exceptions.NoCredentialsError:
+        return "S3 credentials not found"
+    except botocore.exceptions.ClientError as e:
+        return f"Error downloading script from S3: {str(e)}"
+
 @app.route('/recognize', methods=['POST'])
 def recognize_face():
-    return "Heelo"
+    # Receive image data from the client (e.g., a mobile app)
+    image_data = request.data
 
+    # Save the received image data as an image file (you can modify this part if needed)
+    with open('captured_frame.jpg', 'wb') as image_file:
+        image_file.write(image_data)
 
+    # Download the script from S3
+    s3_download_error = download_script_from_s3()
+
+    if s3_download_error:
+        return jsonify({"error": s3_download_error})
+
+    # Execute the downloaded face recognition Python script using subprocess
+    cmd = ['python', 'LoginMoodMentor.py']  # Replace with the actual script name
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    # Check if the script execution was successful
+    if process.returncode == 0:
+        # Parse and convert the script's output to a JSON format (if needed)
+        recognition_results = json.loads(stdout)
+
+        return jsonify(recognition_results)
+    else:
+        return jsonify({"error": "Face recognition script encountered an error"})
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
