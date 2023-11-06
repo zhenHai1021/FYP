@@ -68,14 +68,25 @@ def recognize_face():
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
 
-    # Check if the script execution was successful
-    if process.returncode == 0:
-        # Parse and convert the script's output to a JSON format (if needed)
-        recognition_results = json.loads(stdout)
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
 
-        return jsonify(recognition_results)
+    if process.returncode == 0:
+        print("Script Output:", stdout.decode('utf-8'))
+    # Continue with processing the output
     else:
-        return jsonify({"error": "Face recognition script encountered an error"})
+        print("Script Error:", stderr.decode('utf-8'))
+    # Handle the error
+
+
+    # Check if the script execution was successful
+    #if process.returncode == 0:
+        # Parse and convert the script's output to a JSON format (if needed)
+       # recognition_results = json.loads(stdout)
+
+        #return jsonify(recognition_results)
+    #else:
+        #return jsonify({"error": "Face recognition script encountered an error"})
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
