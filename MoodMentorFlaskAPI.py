@@ -37,7 +37,7 @@ def download_script_from_s3():
     try:
         # AWS S3 bucket details
         S3_BUCKET_NAME = 'facial-login-model-bucket'
-        S3_SCRIPT_KEY = 's3://facial-login-model-bucket/LoginMoodMentor.py'  # Replace with the correct S3 key
+        S3_SCRIPT_KEY = 'https://facial-login-model-bucket.s3.amazonaws.com/LoginMoodMentor.py'  # Replace with the correct S3 key
 
         s3 = boto3.client('s3')
         s3.download_file(S3_BUCKET_NAME, S3_SCRIPT_KEY, 'LoginMoodMentor.py')
