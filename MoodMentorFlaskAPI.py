@@ -45,7 +45,7 @@ def download_script_from_s3():
     except botocore.exceptions.NoCredentialsError:
         return "S3 credentials not found"
     except botocore.exceptions.ClientError as e:
-        return f"Error downloading script from S3: {str(e)}"
+        return f"Error downloading script from S3 in API: {str(e)}"
 
 @app.route('/recognize', methods=['POST'])
 def recognize_face():
