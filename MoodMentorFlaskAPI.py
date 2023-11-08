@@ -10,7 +10,7 @@ import botocore
 import sys
 
 app = Flask(__name__)
-
+s3 = boto3.client('s3')
  # Modify this path if necessary
 
 @app.route('/hello_world', methods=['POST'])
