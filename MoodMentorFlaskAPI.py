@@ -84,11 +84,6 @@ def recognize_face():
 
     while True:
         ret, img = cam.read()
-
-        if not ret:
-        # Handle the case when no frame is available
-        continue
-
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         faces = faceCascade.detectMultiScale(
