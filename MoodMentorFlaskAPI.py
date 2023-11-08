@@ -90,7 +90,11 @@ def recognize_face():
         print(f"Error during recognition: {str(e)}")
         return jsonify({"error": str(e)})
 
-    return jsonify(recognition_results)
+    # Check if any faces were recognized
+    if recognition_results:
+        return jsonify(recognition_results)
+    else:
+        return jsonify({"error": "No faces detected in the image"})
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
