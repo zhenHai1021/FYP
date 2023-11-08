@@ -41,8 +41,34 @@ def hello_world():
 
 
 @app.route('/recognize', methods=['POST'])
-def recognize_face():
-    return 'Hi'
+def recognize_face(event, context):
+    # Define your S3 bucket and object key where the Python code is stored
+    s3_bucket = 'your-s3-bucket-name'
+    s3_object_key = 'path/to/your/python_script.py'
+
+    # Download the Python script from S3
+    local_script_path = '/tmp/script.py'
+    s3.download_file(s3_bucket, s3_object_key, local_script_path)
+
+    # Execute the Python script
+    try:
+        result = subprocess.run(['python3', local_script_path], capture_output=True, text=True)
+        output = result.stdout
+        error = result.stderr
+    except Exception as e:
+        output = None
+        error = str(e)
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps({
+            'output': output,
+            'error': error
+        })
+    }
+
+
+    
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
