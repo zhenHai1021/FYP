@@ -8,6 +8,9 @@ import boto3
 import subprocess
 import botocore
 import sys
+import cv2
+import numpy as np
+import pickle
 
 app = Flask(__name__)
 s3 = boto3.client('s3')
