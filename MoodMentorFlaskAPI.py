@@ -61,6 +61,8 @@ def recognize_face():
 
     recognition_results = []  # Initialize a list to store recognition results
 
+    minW, minH = 0, 0  # Define appropriate values
+
     try:
         for image in images:
             img = convert_image_format(image.read())
@@ -76,25 +78,14 @@ def recognize_face():
             for (x, y, w, h) in faces:
                 id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
 
-                if confidence < 100:
-                    if id >= 0 and id < len(names):
-                        id = names[id]
-                        confidence = round(100 - confidence)  # Remove the '%' symbol
-                    else:
-                        id = "unknown"
-                        confidence = round(100 - confidence)  # Remove the '%' symbol
-                else:
-                    id = "unknown"
-                    confidence = 0  # Set confidence to 0 for unrecognized faces
-
                 result = {
-                    "name": id,
+                    "face_id": id,
                     "confidence": confidence
                 }
                 recognition_results.append(result)
     except Exception as e:
         print(f"Error during recognition: {str(e)}")
-        return jsonify({"error": str(e)})
+        return jsonify({"error": str(e})
 
     # Check if any faces were recognized
     if recognition_results:
