@@ -54,15 +54,13 @@ def download_file_from_s3(bucket_name, s3_key, local_path):
 @app.route('/recognize', methods=['POST'])
 def recognize_face():
     def download_file_from_s3(bucket_name, s3_key, local_path):
-  
-    try:
-        s3.download_file(bucket_name, s3_key, local_path)
-    except botocore.exceptions.NoCredentialsError:
-        return f"S3 credentials not found for {s3_key}"
-    except botocore.exceptions.ClientError as e:
-        return f"Error downloading file from S3: {str(e)}"
-    return None
-    
+        try:
+            s3.download_file(bucket_name, s3_key, local_path)
+        except botocore.exceptions.NoCredentialsError:
+            return f"S3 credentials not found for {s3_key}"
+        except botocore.exceptions.ClientError as e:
+            return f"Error downloading file from S3: {str(e)}"
+        return None
 
     # Download necessary files from S3
     s3_bucket_name = 'facial-login-model-bucket'
@@ -145,6 +143,7 @@ def recognize_face():
             break
 
     return recognition_results
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
