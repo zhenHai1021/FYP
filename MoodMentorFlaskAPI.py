@@ -70,7 +70,7 @@ def recognize_face():
                 return jsonify({"error": "Invalid image format received"})
 
             # Check the file size
-            if len(image.read()) < 100:  # Adjust the size threshold as needed
+            if len(image.read()) < 80:  # Adjust the size threshold as needed
                 return jsonify({"error": "Image file size is too small"})
 
             img = convert_image_format(image.read())
@@ -78,8 +78,8 @@ def recognize_face():
 
             faces = faceCascade.detectMultiScale(
                 gray,
-                scaleFactor=3,  # Adjust scaleFactor as needed
-                minNeighbors=5,    # Adjust minNeighbors as needed
+                scaleFactor=1.1,  # Adjust scaleFactor as needed
+                minNeighbors=3,    # Adjust minNeighbors as needed
                 minSize=(int(minW), int(minH)),
             )
 
