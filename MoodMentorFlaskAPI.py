@@ -32,11 +32,11 @@ def recognize_face():
     names_pkl_error = download_file_from_s3(s3_bucket_name, s3_names_pkl_key, 'names.pkl')
 
     if trainer_yml_error:
-        return [{"error": trainer_yml_error}]
+        return {"error": trainer_yml_error}
     if cascade_xml_error:
-        return [{"error": cascade_xml_error}]
+        return {"error": cascade_xml_error}
     if names_pkl_error:
-        return [{"error": names_pkl_error}]
+        return {"error": names_pkl_error}
 
     # Load downloaded files
     recognizer = cv2.face.LBPHFaceRecognizer_create()
@@ -46,20 +46,13 @@ def recognize_face():
 
     font = cv2.FONT_HERSHEY_SIMPLEX
 
-    cam = cv2.VideoCapture(0)  # Access the default camera (phone's camera)
-    cam.set(3, 640)  # Set video width
-    cam.set(4, 480)  # Set video height
-
-    minW = 0.1 * cam.get(3)
-    minH = 0.1 * cam.get(4)
-
-    with open('names.pkl', 'rb') as f:
-        names = pickle.load(f)
+    # Process images received from the Flutter app
+    images = request.files.getlist('images')
 
     recognition_results = []  # Initialize a list to store recognition results
 
-    while True:
-        ret, img = cam.read()
+    for image in images:
+        img = cv2.imdecode(np.frombuffer(image.read(), np.uint8), cv2.IMREAD_COLOR)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         faces = faceCascade.detectMultiScale(
@@ -70,8 +63,6 @@ def recognize_face():
         )
 
         for (x, y, w, h) in faces:
-            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
             id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
 
             if confidence < 100:
@@ -91,17 +82,7 @@ def recognize_face():
             }
             recognition_results.append(result)
 
-            cv2.putText(img, str(id), (x + 5, y - 5), font, 1, (255, 255, 255), 2)
-            cv2.putText(img, str(confidence), (x + 5, y + h - 5), font, 1, (255, 255, 0), 1)
-
-        cv2.imshow('camera', img)
-
-        k = cv2.waitKey(10) & 0xff
-        if k == 27:
-            break
-
-    return recognition_results
-
+    return jsonify(recognition_results)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
