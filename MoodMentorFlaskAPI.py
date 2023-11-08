@@ -47,9 +47,9 @@ def hello_world():
 def recognize_face():
     # Download necessary files from S3
     s3_bucket_name = 'facial-login-model-bucket'
-    s3_trainer_yml_key = 's3://facial-login-model-bucket/trainer/trainer.yml'
-    s3_cascade_xml_key = 's3://facial-login-model-bucket/haarcascade_frontalface_default.xml'
-    s3_names_pkl_key = 's3://facial-login-model-bucket/names.pkl'
+    s3_trainer_yml_key = 'trainer/trainer.yml'
+    s3_cascade_xml_key = 'haarcascade_frontalface_default.xml'
+    s3_names_pkl_key = 'names.pkl'
 
     trainer_yml_error = download_file_from_s3(s3_bucket_name, s3_trainer_yml_key, 'trainer.yml')
     cascade_xml_error = download_file_from_s3(s3_bucket_name, s3_cascade_xml_key, 'haarcascade_frontalface_default.xml')
