@@ -48,7 +48,7 @@ def download_script_from_s3():
         S3_SCRIPT_KEY = 'LoginMoodMentor.py'
 
         # Download the script and save it as 'LoginMoodMentorTmp.py'
-        s3.download_file(S3_BUCKET_NAME, S3_SCRIPT_KEY, 'LoginMoodMentorTmp.py')
+        s3.download_file(S3_BUCKET_NAME, S3_SCRIPT_KEY, 'LoginMoodMentor.py')
         return None
     except NoCredentialsError:
         return "S3 credentials not found"
@@ -75,7 +75,7 @@ def recognize_face():
     # Specify the full path to your Python interpreter
     python_path = '/usr/bin/python3' # Replace with the actual path
     # Execute the downloaded face recognition Python script using subprocess
-    cmd = ['python', 'LoginMoodMentorTmp.py']  # Replace with the actual script name
+    cmd = ['python', 'LoginMoodMentor.py']  # Replace with the actual script name
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
 
