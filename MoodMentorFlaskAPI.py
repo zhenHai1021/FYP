@@ -40,7 +40,15 @@ def hello_world():
         return jsonify({'error': str(e)})
 
 
-
+def download_file_from_s3(bucket_name, s3_key, local_path):
+    s3 = boto3.client('s3')
+    try:
+        s3.download_file(bucket_name, s3_key, local_path)
+    except botocore.exceptions.NoCredentialsError:
+        return f"S3 credentials not found for {s3_key}"
+    except botocore.exceptions.ClientError as e:
+        return f"Error downloading file from S3: {str(e)}"
+    return None
 
 
 @app.route('/recognize', methods=['POST'])
@@ -51,27 +59,41 @@ def recognize_face():
 
     # Download the Python script from S3
     local_script_path = '/tmp/LoginMoodMentor.py'
-    s3.download_file(s3_bucket, s3_object_key, local_script_path)
+    s3_download_error = download_file_from_s3(s3_bucket, s3_object_key, local_script_path)
+
+    if s3_download_error:
+        return {
+            'statusCode': 500,
+            'error': s3_download_error
+        }
 
     # Execute the Python script
     try:
         result = subprocess.run(['python3', local_script_path], capture_output=True, text=True)
         output = result.stdout
         error = result.stderr
+
+        if result.returncode == 0:
+            # Successfully executed
+            return {
+                'statusCode': 200,
+                'message': 'Script executed successfully',
+                'output': output,
+                'error': error
+            }
+        else:
+            return {
+                'statusCode': 500,
+                'message': 'Script execution failed',
+                'output': output,
+                'error': error
+            }
     except Exception as e:
-        output = None
-        error = str(e)
-
-    return {
-        'statusCode': 200,
-        'body': json.dumps({
-            'output': output,
-            'error': error
-        })
-    }
-
-
-    
+        return {
+            'statusCode': 500,
+            'message': 'An error occurred during script execution',
+            'error': str(e)
+        }
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
