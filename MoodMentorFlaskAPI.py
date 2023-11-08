@@ -50,18 +50,17 @@ def download_file_from_s3(bucket_name, s3_key, local_path):
         return f"Error downloading file from S3: {str(e)}"
     return None
 
+ def download_file_from_s3(bucket_name, s3_key, local_path):
+    try:
+        s3.download_file(bucket_name, s3_key, local_path)
+    except botocore.exceptions.NoCredentialsError:
+        return f"S3 credentials not found for {s3_key}"
+    except botocore.exceptions.ClientError as e:
+        return f"Error downloading dataset from S3: {str(e)}"
+    return None
 
 @app.route('/recognize', methods=['POST'])
 def recognize_face():
-    def download_file_from_s3(bucket_name, s3_key, local_path):
-        try:
-            s3.download_file(bucket_name, s3_key, local_path)
-        except botocore.exceptions.NoCredentialsError:
-            return f"S3 credentials not found for {s3_key}"
-        except botocore.exceptions.ClientError as e:
-            return f"Error downloading dataset from S3: {str(e)}"
-        return None
-
     # Download necessary files from S3
     s3_bucket_name = 'facial-login-model-bucket'
     s3_trainer_yml_key = 's3://facial-login-model-bucket/trainer/trainer.yml'
@@ -77,7 +76,7 @@ def recognize_face():
     if cascade_xml_error:
         return [{"error": cascade_xml_error}]
     if names_pkl_error:
-        return [{"error": names_pkl_error}]
+        return [{"error": names_pkl_error}
 
     # Load downloaded files
     recognizer = cv2.face_LBPHFaceRecognizer.create()
@@ -122,7 +121,7 @@ def recognize_face():
                     confidence = round(100 - confidence)  # Remove the '%' symbol
                 else:
                     id = "unknown"
-                    confidence = round(100 - confidence)  # Remove the '%' symbol
+                    confidence = round 100 - confidence  # Remove the '%' symbol
             else:
                 id = "unknown"
                 confidence = 0  # Set confidence to 0 for unrecognized faces
