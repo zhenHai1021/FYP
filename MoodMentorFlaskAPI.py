@@ -63,7 +63,7 @@ def recognize_face():
         return [{"error": names_pkl_error}]
 
     # Load downloaded files
-    recognizer = cv2.face_LBPHFaceRecognizer.create()
+    recognizer = cv2.createLBPHFaceRecognizer()
     recognizer.read('trainer.yml')
     cascadePath = 'haarcascade_frontalface_default.xml'
     faceCascade = cv2.CascadeClassifier(cascadePath)
@@ -126,6 +126,7 @@ def recognize_face():
             break
 
     return recognition_results
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
