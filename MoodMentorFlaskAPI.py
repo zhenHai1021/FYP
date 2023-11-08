@@ -93,7 +93,7 @@ def recognize_face():
                 recognition_results.append(result)
     except Exception as e:
         print(f"Error during recognition: {str(e)}")
-        return jsonify({"error": str(e})
+        return jsonify({"error": str(e)})
 
     # Check if any faces were recognized
     if recognition_results:
