@@ -11,7 +11,7 @@ app = Flask(__name__)
 
  # Modify this path if necessary
 
-@app.route('/hello_world')
+@app.route('/hello_world', methods=['POST'])
 def hello_world():
     try:
         S3_PUBLIC_URL = 'https://facial-login-model-bucket.s3.amazonaws.com/hello_world.py'  # Replace with your S3 bucket URL
