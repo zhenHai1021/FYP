@@ -59,7 +59,7 @@ def recognize_face():
         except botocore.exceptions.NoCredentialsError:
             return f"S3 credentials not found for {s3_key}"
         except botocore.exceptions.ClientError as e:
-            return f"Error downloading file from S3: {str(e)}"
+            return f"Error downloading dataset from S3: {str(e)}"
         return None
 
     # Download necessary files from S3
