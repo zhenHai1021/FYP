@@ -78,7 +78,7 @@ def recognize_face():
 
             faces = faceCascade.detectMultiScale(
                 gray,
-                scaleFactor=1.1,  # Adjust scaleFactor as needed
+                scaleFactor=3,  # Adjust scaleFactor as needed
                 minNeighbors=5,    # Adjust minNeighbors as needed
                 minSize=(int(minW), int(minH)),
             )
