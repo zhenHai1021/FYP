@@ -40,15 +40,7 @@ def hello_world():
         return jsonify({'error': str(e)})
 
 
-def download_file_from_s3(bucket_name, s3_key, local_path):
-    s3 = boto3.client('s3')
-    try:
-        s3.download_file(bucket_name, s3_key, local_path)
-    except botocore.exceptions.NoCredentialsError:
-        return f"S3 credentials not found for {s3_key}"
-    except botocore.exceptions.ClientError as e:
-        return f"Error downloading file from S3: {str(e)}"
-    return None
+
 
  def download_file_from_s3(bucket_name, s3_key, local_path):
     try:
