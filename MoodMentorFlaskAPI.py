@@ -54,7 +54,7 @@ def download_file_from_s3(bucket_name, s3_key, local_path):
 @app.route('/recognize', methods=['POST'])
 def recognize_face():
     def download_file_from_s3(bucket_name, s3_key, local_path):
-    s3 = boto3.client('s3')
+  
     try:
         s3.download_file(bucket_name, s3_key, local_path)
     except botocore.exceptions.NoCredentialsError:
