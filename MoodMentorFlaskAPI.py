@@ -61,7 +61,7 @@ def recognize_face():
 
     recognition_results = []  # Initialize a list to store recognition results
 
-    minW, minH = 0, 0  # Define appropriate values
+    minW, minH = 64, 48  # Define appropriate values
 
     try:
         for image in images:
