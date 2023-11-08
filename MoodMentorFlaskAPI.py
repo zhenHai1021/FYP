@@ -56,7 +56,7 @@ def recognize_face():
 
     font = cv2.FONT_HERSHEY_SIMPLEX
 
-    # Process images received from the Flutter app
+   # Process images received from the Flutter app
     images = request.files.getlist('images')
 
     if not images:
