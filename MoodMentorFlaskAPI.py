@@ -38,6 +38,10 @@ def recognize_face():
     if names_pkl_error:
         return {"error": names_pkl_error}
 
+    # Check if required files exist
+    if not os.path.isfile('trainer.yml') or not os.path.isfile('haarcascade_frontalface_default.xml') or not os.path.isfile('names.pkl'):
+        return jsonify({"error": "Missing required files for recognition"})
+
     # Load downloaded files
     recognizer = cv2.face.LBPHFaceRecognizer_create()
     recognizer.read('trainer.yml')
@@ -51,36 +55,40 @@ def recognize_face():
 
     recognition_results = []  # Initialize a list to store recognition results
 
-    for image in images:
-        img = cv2.imdecode(np.frombuffer(image.read(), np.uint8), cv2.IMREAD_COLOR)
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    try:
+        for image in images:
+            img = cv2.imdecode(np.frombuffer(image.read(), np.uint8), cv2.IMREAD_COLOR)
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        faces = faceCascade.detectMultiScale(
-            gray,
-            scaleFactor=1.2,
-            minNeighbors=5,
-            minSize=(int(minW), int(minH)),
-        )
+            faces = faceCascade.detectMultiScale(
+                gray,
+                scaleFactor=1.2,
+                minNeighbors=5,
+                minSize=(int(minW), int(minH)),
+            )
 
-        for (x, y, w, h) in faces:
-            id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
+            for (x, y, w, h) in faces:
+                id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
 
-            if confidence < 100:
-                if id >= 0 and id < len(names):
-                    id = names[id]
-                    confidence = round(100 - confidence)  # Remove the '%' symbol
+                if confidence < 100:
+                    if id >= 0 and id < len(names):
+                        id = names[id]
+                        confidence = round(100 - confidence)  # Remove the '%' symbol
+                    else:
+                        id = "unknown"
+                        confidence = round(100 - confidence)  # Remove the '%' symbol
                 else:
                     id = "unknown"
-                    confidence = round(100 - confidence)  # Remove the '%' symbol
-            else:
-                id = "unknown"
-                confidence = 0  # Set confidence to 0 for unrecognized faces
+                    confidence = 0  # Set confidence to 0 for unrecognized faces
 
-            result = {
-                "name": id,
-                "confidence": confidence
-            }
-            recognition_results.append(result)
+                result = {
+                    "name": id,
+                    "confidence": confidence
+                }
+                recognition_results.append(result)
+    except Exception as e:
+        print(f"Error during recognition: {str(e)}")
+        return jsonify({"error": str(e)})
 
     return jsonify(recognition_results)
 
