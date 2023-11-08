@@ -43,11 +43,11 @@ def hello_world():
 @app.route('/recognize', methods=['POST'])
 def recognize_face():
     # Define your S3 bucket and object key where the Python code is stored
-    s3_bucket = 'your-s3-bucket-name'
-    s3_object_key = 'path/to/your/python_script.py'
+    s3_bucket = 'facial-login-model-bucket'
+    s3_object_key = 'LoginMoodMentor.py'
 
     # Download the Python script from S3
-    local_script_path = '/tmp/script.py'
+    local_script_path = '/tmp/LoginMoodMentor.py'
     s3.download_file(s3_bucket, s3_object_key, local_script_path)
 
     # Execute the Python script
