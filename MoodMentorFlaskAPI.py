@@ -19,6 +19,12 @@ def download_file_from_s3(bucket_name, s3_key, local_path):
         return f"Error downloading dataset from S3: {str(e)}"
     return None
 
+def convert_image_format(image_data):
+    # Assuming the image data is in a format like JPEG
+    # Convert the image to OpenCV's format (BGR)
+    img = cv2.imdecode(np.frombuffer(image_data, np.uint8), cv2.IMREAD_COLOR)
+    return img
+
 @app.route('/recognize', methods=['POST'])
 def recognize_face():
     # Download necessary files from S3
@@ -57,7 +63,7 @@ def recognize_face():
 
     try:
         for image in images:
-            img = cv2.imdecode(np.frombuffer(image.read(), np.uint8), cv2.IMREAD_COLOR)
+            img = convert_image_format(image.read())
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
             faces = faceCascade.detectMultiScale(
