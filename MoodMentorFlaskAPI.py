@@ -6,6 +6,7 @@ import requests
 import os
 import boto3
 import botocore
+import face_recognition
 
 app = Flask(__name__)
 s3 = boto3.client('s3')
