@@ -65,6 +65,14 @@ def recognize_face():
 
     try:
         for image in images:
+            # Check if the received file is a valid image (e.g., JPEG)
+            if not image.content_type.startswith('image'):
+                return jsonify({"error": "Invalid image format received"})
+
+            # Check the file size
+            if len(image.read()) < 100:  # Adjust the size threshold as needed
+                return jsonify({"error": "Image file size is too small"})
+
             img = convert_image_format(image.read())
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -85,7 +93,7 @@ def recognize_face():
                 recognition_results.append(result)
     except Exception as e:
         print(f"Error during recognition: {str(e)}")
-        return jsonify({"error": str(e)})
+        return jsonify({"error": str(e})
 
     # Check if any faces were recognized
     if recognition_results:
