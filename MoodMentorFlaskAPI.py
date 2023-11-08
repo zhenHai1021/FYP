@@ -41,7 +41,7 @@ def hello_world():
 
 
 @app.route('/recognize', methods=['POST'])
-def recognize_face(event, context):
+def recognize_face():
     # Define your S3 bucket and object key where the Python code is stored
     s3_bucket = 'your-s3-bucket-name'
     s3_object_key = 'path/to/your/python_script.py'
